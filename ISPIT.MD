@@ -2,11 +2,16 @@
 
 ## 1. Odabir target kolone
 
-Kao ciljnu (target) varijablu odabrala sam kolonu **Customer Type** jer:
+Za target kolonu sam odabrala 'Customer Type' iz sljedećih razloga:
+- Profesorica je navela da 'satisfaction' ne smijemo koristiti jer je previše očigledan
+- 'Customer Type' predstavlja binarni klasifikacioni problem (Loyal customer vs Disloyal customer)
+- Ova kolona nema nedostajućih vrijednosti
+- Postoji logična veza između ostalih kolona (ocjene usluga, kašnjenja, klasa putovanja) 
+  i toga da li će putnik ostati lojalan
+- Sa poslovne perspektive, aviokompanijama je važno da predvide ko će im biti lojalni kupci
 
-- Predstavlja binarni klasifikacijski problem (*Loyal Customer* / *Disloyal Customer*).
-- Ne sadrži nedostajuće vrijednosti.
-- Ima značajnu poslovnu vrijednost, jer aviokompanije žele identificirati putnike koji će ostati vjerni njihovim uslugama.
+Napomena: Prvobitno sam htjela koristiti 'satisfaction', ali mi je to zabranjeno, 
+pa sam odabrala sljedeći najlogičniji target.
 
 ---
 
