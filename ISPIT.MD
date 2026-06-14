@@ -46,6 +46,25 @@ Nakon učitavanja dataseta izvršena je osnovna eksploratorna analiza podataka:
 - `df.isnull().sum()` → otkriveno je da samo kolona **Arrival Delay in Minutes** sadrži nedostajuće vrijednosti (310).
 - `df.describe()` → daje statistički pregled numeričkih karakteristika.
 
+**3. Početno istraživanje podataka (EDA)**
+
+Nakon učitavanja dataseta, izvršila sam sljedeće komande:
+
+- df.head() - prikazala sam prvih 5 redova kako bih vidjela kako izgledaju podaci. 
+  Uočila sam da postoje numeričke (Age, Flight Distance) i kategorijske kolone (Gender, Satisfaction).
+
+- df.info() - pokazao je da dataset ima X redova i Y kolona. 
+  Primijetila sam da kolone 'Arrival Delay in Minutes' ima 310 NaN vrijednosti, 
+  a 'Departure Delay in Minutes' ima 52 NaN vrijednosti.
+
+- df.isnull().sum() - potvrdila sam tačan broj nedostajućih vrijednosti:
+  * Arrival Delay in Minutes: 310 nedostajućih
+  * Departure Delay in Minutes: 52 nedostajućih
+  * Ostale kolone nemaju NaN vrijednosti.
+
+- df.describe() - prikazala sam osnovnu statistiku za numeričke kolone. 
+  Uočila sam da se Age kreće od 7 do 85 godina, a Flight Distance od 31 do 4983 milja.
+
 ---
 
 ## 4. Obrada nedostajućih vrijednosti
