@@ -39,6 +39,28 @@ pa sam odabrala sljedeći najlogičniji target.
 | Departure Delay in Minutes | ✅ DA | Kašnjenja mogu negativno uticati na lojalnost |
 | Arrival Delay in Minutes | ✅ DA | Kašnjenja mogu negativno uticati na lojalnost |
 
+
+
+Nakon odabira target kolone 'Customer Type', pristupila sam odabiru ulaznih kolona:
+
+Izbačene kolone i obrazloženje:
+
+1. 'Unnamed: 0' i 'id' – identifikatori koji ne nose informaciju o lojalnosti putnika. 
+   Njihovim uklanjanjem izbjegavam data leakage.
+
+2. 'satisfaction' – iako na prvi pogled izgleda korisno, ova kolona je visoko korelirana 
+   sa targetom. Zadovoljni putnici su gotovo uvijek lojalni, a nezadovoljni često nelojalni. 
+   Zadržavanje ove kolone dovelo bi do lažno visoke tačnosti (preko 95%) i model ne bi 
+   naučio prave veze među ostalim karakteristikama.
+
+Zadržane kolone:
+- Sve demografske: Gender, Age
+- Karakteristike putovanja: Type of Travel, Class, Flight Distance
+- Sve ocjene usluga (0-5): Inflight wifi service, Online boarding, Seat comfort, itd.
+- Vremena kašnjenja: Departure Delay in Minutes, Arrival Delay in Minutes
+
+Napomena: Kolone sa ocjenama zadržavam jer pretpostavljam da lojalni putnici generalno 
+daju više ocjene, ali to model treba da dokaže.
 ---
 
 ## 3. Početna analiza podataka (EDA)
