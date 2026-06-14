@@ -67,6 +67,24 @@ Izbacujemo kolone iz tri glavna razloga:
 Razlog	Objašnjenje	Primjer u tvom datasetu
 1. Identifikatori	Kolone koje jedinstveno označavaju svaki red, ne nose informaciju za predviđanje	Unnamed: 0, id
 2. Data leakage (curenje informacija)	Kolone koje "otkrivaju" target vrijednost prije nego što model uči – daju lažno visoku tačnost	satisfaction (jer znaš da je zadovoljan = lojalan)
+
+4. Izbacivanje nepotrebnih kolona
+
+Prije obrade podataka, izbacila sam sljedeće kolone:
+
+1. 'Unnamed: 0' i 'id' – Ove kolone su identifikatori koji jedinstveno 
+   označavaju svakog putnika. One ne sadrže informaciju koja bi mogla 
+   predvidjeti da li je putnik lojalan ili ne. Njihovim uklanjanjem 
+   sprječavamo model da uči na nasumičnim brojevima.
+
+2. 'satisfaction' – Ovu kolonu izbacujem zbog data leakage. 
+   Zadovoljstvo putnika je direktno povezano sa lojalnošću – 
+   zadovoljni putnici su gotovo uvijek lojalni. Da je zadržim, 
+   model bi postigao vještački visoku tačnost (preko 95%) bez 
+   učenja pravih veza među ostalim karakteristikama.
+
+Nakon izbacivanja, dataset ima 22 kolone (od originalnih 25). 
+Sve ostale kolone su zadržane jer potencijalno utiču na Customer Type.
 ---
 
 ## 3. Početna analiza podataka (EDA)
