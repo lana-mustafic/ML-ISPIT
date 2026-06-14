@@ -61,6 +61,12 @@ Zadržane kolone:
 
 Napomena: Kolone sa ocjenama zadržavam jer pretpostavljam da lojalni putnici generalno 
 daju više ocjene, ali to model treba da dokaže.
+
+Izbacujemo kolone iz tri glavna razloga:
+
+Razlog	Objašnjenje	Primjer u tvom datasetu
+1. Identifikatori	Kolone koje jedinstveno označavaju svaki red, ne nose informaciju za predviđanje	Unnamed: 0, id
+2. Data leakage (curenje informacija)	Kolone koje "otkrivaju" target vrijednost prije nego što model uči – daju lažno visoku tačnost	satisfaction (jer znaš da je zadovoljan = lojalan)
 ---
 
 ## 3. Početna analiza podataka (EDA)
