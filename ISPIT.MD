@@ -4,10 +4,10 @@
 
 Za target kolonu odabrala sam **Customer Type** iz sljedećih razloga:
 
-* Predstavlja binarni klasifikacijski problem (*Loyal Customer* i *Disloyal Customer*).
-* Ne sadrži nedostajuće vrijednosti.
-* Postoji logična povezanost između karakteristika putovanja, kvaliteta usluge i lojalnosti korisnika.
-* Sa poslovnog aspekta, aviokompanijama je važno da prepoznaju putnike koji će ostati vjerni njihovim uslugama.
+- Predstavlja binarni klasifikacijski problem (*Loyal Customer* i *Disloyal Customer*).
+- Ne sadrži nedostajuće vrijednosti.
+- Postoji logična povezanost između karakteristika putovanja, kvaliteta usluge i lojalnosti korisnika.
+- Sa poslovnog aspekta, aviokompanijama je važno prepoznati putnike koji će ostati vjerni njihovim uslugama.
 
 Prvobitno sam planirala koristiti kolonu **satisfaction** kao target, međutim profesorica je naglasila da se ona ne smije koristiti jer je previše očigledno povezana sa ostalim karakteristikama i ne predstavlja dovoljno izazovan problem za model.
 
@@ -19,26 +19,36 @@ Nakon odabira target kolone izvršena je analiza svih atributa kako bi se utvrdi
 
 ### Izbačene kolone
 
-| Kolona       | Razlog                                                                     |
-| ------------ | -------------------------------------------------------------------------- |
-| Unnamed: 0   | Predstavlja identifikator i nema prediktivnu vrijednost                    |
-| id           | Jedinstveni identifikator putnika                                          |
+| Kolona | Razlog |
+|---------|---------|
+| Unnamed: 0 | Predstavlja identifikator i nema prediktivnu vrijednost |
+| id | Jedinstveni identifikator putnika |
 | satisfaction | Može uzrokovati data leakage jer je veoma povezana sa lojalnošću korisnika |
 
 Kolone **Unnamed: 0** i **id** uklonjene su jer predstavljaju identifikatore. Takve kolone ne sadrže korisne informacije za predviđanje i mogu dovesti do pogrešnog učenja modela.
 
-Kolona **satisfaction** uklonjena je zbog problema poznatog kao **data leakage**. Zadovoljstvo putnika je direktno povezano sa lojalnošću, pa bi model mogao ostvariti veoma visoku tačnost bez stvarnog učenja odnosa među ostalim karakteristikama. Cilj je da model nauči obrasce ponašanja korisnika na osnovu kvaliteta usluge, vrste putovanja i drugih atributa.
+Kolona **satisfaction** uklonjena je zbog problema poznatog kao **data leakage**. Zadovoljstvo putnika je direktno povezano sa lojalnošću, pa bi model mogao ostvariti veoma visoku tačnost bez stvarnog učenja odnosa među ostalim karakteristikama.
 
 ### Zadržane kolone
 
-Zadržane su sljedeće grupe atributa:
-
-* Demografski podaci (*Gender, Age*)
-* Karakteristike putovanja (*Type of Travel, Class, Flight Distance*)
-* Ocjene kvaliteta usluge (*Inflight Wifi Service, Online Boarding, Seat Comfort, Cleanliness, Baggage Handling i ostale ocjene od 0 do 5*)
-* Podaci o kašnjenjima (*Departure Delay in Minutes, Arrival Delay in Minutes*)
-
-Pretpostavka je da kvalitet usluge, udobnost putovanja i tačnost letova mogu značajno uticati na lojalnost korisnika.
+| Kolona | Zadržana? | Obrazloženje |
+|---------|----------|--------------|
+| Gender | ✅ DA | Spol može uticati na korisničke preference |
+| Age | ✅ DA | Starost može uticati na obrasce ponašanja putnika |
+| Type of Travel | ✅ DA | Poslovni putnici često pokazuju veću lojalnost |
+| Class | ✅ DA | Putnici u poslovnoj klasi su često lojalniji |
+| Flight Distance | ✅ DA | Dužina leta može uticati na ukupno iskustvo putovanja |
+| Inflight wifi service | ✅ DA | Kvalitet usluge utiče na zadovoljstvo i lojalnost |
+| Inflight entertainment | ✅ DA | Kvalitet usluge utiče na zadovoljstvo i lojalnost |
+| Online support | ✅ DA | Kvalitet korisničke podrške utiče na lojalnost |
+| Ease of Online booking | ✅ DA | Jednostavnost rezervacije može povećati lojalnost korisnika |
+| On-board service | ✅ DA | Kvalitet usluge tokom leta utiče na korisničko iskustvo |
+| Leg room service | ✅ DA | Udobnost tokom leta može uticati na lojalnost |
+| Baggage handling | ✅ DA | Kvalitet rukovanja prtljagom utiče na zadovoljstvo korisnika |
+| Checkin service | ✅ DA | Efikasnost prijave može uticati na iskustvo putnika |
+| Cleanliness | ✅ DA | Čistoća direktno utiče na percepciju kvaliteta usluge |
+| Departure Delay in Minutes | ✅ DA | Kašnjenja mogu negativno uticati na lojalnost |
+| Arrival Delay in Minutes | ✅ DA | Kašnjenja mogu negativno uticati na lojalnost |
 
 Nakon uklanjanja nepotrebnih kolona dataset je sadržavao **22 korisne ulazne karakteristike**.
 
@@ -102,8 +112,8 @@ Prilikom analize podataka ustanovljeno je da samo kolona **Arrival Delay in Minu
 
 Za obradu nedostajućih podataka korištene su sljedeće strategije:
 
-* Numeričke kolone popunjavane su medijanom.
-* Kategorijske kolone popunjavane su najčešćom vrijednošću (modom).
+- Numeričke kolone popunjavane su medijanom.
+- Kategorijske kolone popunjavane su najčešćom vrijednošću (modom).
 
 Medijan je odabran jer je otporniji na ekstremne vrijednosti od aritmetičke sredine.
 
@@ -129,18 +139,18 @@ Kako modeli mašinskog učenja mogu raditi samo sa numeričkim podacima, bilo je
 
 ### Label Encoding target kolone
 
-Za kolonu **Customer Type** korišten je LabelEncoder:
-
-* Disloyal Customer → 0
-* Loyal Customer → 1
+```python
+Disloyal Customer -> 0
+Loyal Customer -> 1
+```
 
 ### One-Hot Encoding ulaznih atributa
 
 Za ostale kategorijske kolone korišten je One-Hot Encoding:
 
-* Gender
-* Type of Travel
-* Class
+- Gender
+- Type of Travel
+- Class
 
 Korišten je parametar `drop_first=True` kako bi se izbjegla multikolinearnost.
 
@@ -154,18 +164,18 @@ Podaci su podijeljeni pomoću funkcije `train_test_split()`.
 
 Parametri:
 
-* test_size = 0.2
-* random_state = 42
-* stratify = y
+- `test_size = 0.2`
+- `random_state = 42`
+- `stratify = y`
 
 Dobijeni skupovi:
 
-| Skup    | Dimenzije   |
-| ------- | ----------- |
+| Skup | Dimenzije |
+|--------|------------|
 | X_train | (83123, 22) |
-| X_test  | (20781, 22) |
-| y_train | (83123,)    |
-| y_test  | (20781,)    |
+| X_test | (20781, 22) |
+| y_train | (83123,) |
+| y_test | (20781,) |
 
 Parametar `stratify` korišten je kako bi se očuvala ista distribucija klasa u trening i test skupu.
 
@@ -174,8 +184,6 @@ Parametar `stratify` korišten je kako bi se očuvala ista distribucija klasa u 
 ## 7. Skaliranje podataka
 
 Za model **Logistic Regression** primijenjeno je skaliranje pomoću StandardScaler-a.
-
-Korištene metode:
 
 ```python
 scaler.fit_transform(X_train)
@@ -190,37 +198,31 @@ Model **Random Forest** ne zahtijeva skaliranje pa je treniran na originalnim po
 
 ## 8. Izbor modela i treniranje
 
-Za rješavanje klasifikacijskog problema korištena su dva modela.
-
 ### Logistic Regression
-
-Parametri:
 
 ```python
 LogisticRegression(max_iter=1000, random_state=42)
 ```
 
-Ovaj model predstavlja jednostavan i lako interpretabilan bazni model.
+Predstavlja jednostavan i interpretabilan bazni model.
 
 ### Random Forest
-
-Parametri:
 
 ```python
 RandomForestClassifier(n_estimators=100, random_state=42)
 ```
 
-Random Forest koristi više stabala odlučivanja i sposoban je prepoznati složenije obrasce u podacima.
+Predstavlja napredniji ansambl model sposoban da prepozna složenije obrasce u podacima.
 
 ---
 
 ## 9. Rezultati i zaključak
 
-Nakon treniranja i evaluacije modela, Random Forest ostvario je bolje rezultate od Logistic Regression modela.
+Nakon treniranja i evaluacije modela, **Random Forest** ostvario je bolje rezultate od Logistic Regression modela.
 
 Najznačajniji rezultat bio je:
 
-* Recall = 99.57%
+- Recall = 99.57%
 
 To znači da model veoma uspješno prepoznaje lojalne korisnike i rijetko ih pogrešno klasificira.
 
