@@ -2,237 +2,228 @@
 
 ## 1. Odabir target kolone
 
-Za target kolonu sam odabrala 'Customer Type' iz sljedećih razloga:
-- Profesorica je navela da 'satisfaction' ne smijemo koristiti jer je previše očigledan
-- 'Customer Type' predstavlja binarni klasifikacioni problem (Loyal customer vs Disloyal customer)
-- Ova kolona nema nedostajućih vrijednosti
-- Postoji logična veza između ostalih kolona (ocjene usluga, kašnjenja, klasa putovanja) 
-  i toga da li će putnik ostati lojalan
-- Sa poslovne perspektive, aviokompanijama je važno da predvide ko će im biti lojalni kupci
+Za target kolonu odabrala sam **Customer Type** iz sljedećih razloga:
 
-Napomena: Prvobitno sam htjela koristiti 'satisfaction', ali mi je to zabranjeno, 
-pa sam odabrala sljedeći najlogičniji target.
+* Predstavlja binarni klasifikacijski problem (*Loyal Customer* i *Disloyal Customer*).
+* Ne sadrži nedostajuće vrijednosti.
+* Postoji logična povezanost između karakteristika putovanja, kvaliteta usluge i lojalnosti korisnika.
+* Sa poslovnog aspekta, aviokompanijama je važno da prepoznaju putnike koji će ostati vjerni njihovim uslugama.
+
+Prvobitno sam planirala koristiti kolonu **satisfaction** kao target, međutim profesorica je naglasila da se ona ne smije koristiti jer je previše očigledno povezana sa ostalim karakteristikama i ne predstavlja dovoljno izazovan problem za model.
 
 ---
 
 ## 2. Odabir ulaznih kolona
 
-| Kolona | Zadržana? | Obrazloženje |
-|---------|----------|--------------|
-| Unnamed: 0 | ❌ NE | Predstavlja identifikator i nema prediktivnu vrijednost |
-| id | ❌ NE | Jedinstveni identifikator putnika |
-| satisfaction | ❌ NE | Može uzrokovati data leakage jer je veoma povezano sa lojalnošću korisnika |
-| Gender | ✅ DA | Spol može uticati na korisničke preference |
-| Age | ✅ DA | Starost može uticati na obrasce ponašanja putnika |
-| Type of Travel | ✅ DA | Poslovni putnici često pokazuju veću lojalnost |
-| Class | ✅ DA | Putnici u poslovnoj klasi su često lojalniji |
-| Flight Distance | ✅ DA | Dužina leta može uticati na ukupno iskustvo putovanja |
-| Inflight wifi service | ✅ DA | Kvalitet usluge utiče na zadovoljstvo i lojalnost |
-| Inflight entertainment | ✅ DA | Kvalitet usluge utiče na zadovoljstvo i lojalnost |
-| Online support | ✅ DA | Kvalitet korisničke podrške utiče na lojalnost |
-| Ease of Online booking | ✅ DA | Jednostavnost rezervacije može povećati lojalnost korisnika |
-| On-board service | ✅ DA | Kvalitet usluge tokom leta utiče na korisničko iskustvo |
-| Leg room service | ✅ DA | Udobnost tokom leta može uticati na lojalnost |
-| Baggage handling | ✅ DA | Kvalitet rukovanja prtljagom utiče na zadovoljstvo korisnika |
-| Checkin service | ✅ DA | Efikasnost prijave može uticati na iskustvo putnika |
-| Cleanliness | ✅ DA | Čistoća direktno utiče na percepciju kvaliteta usluge |
-| Departure Delay in Minutes | ✅ DA | Kašnjenja mogu negativno uticati na lojalnost |
-| Arrival Delay in Minutes | ✅ DA | Kašnjenja mogu negativno uticati na lojalnost |
+Nakon odabira target kolone izvršena je analiza svih atributa kako bi se utvrdilo koje kolone treba zadržati, a koje ukloniti.
 
+### Izbačene kolone
 
+| Kolona       | Razlog                                                                     |
+| ------------ | -------------------------------------------------------------------------- |
+| Unnamed: 0   | Predstavlja identifikator i nema prediktivnu vrijednost                    |
+| id           | Jedinstveni identifikator putnika                                          |
+| satisfaction | Može uzrokovati data leakage jer je veoma povezana sa lojalnošću korisnika |
 
-Nakon odabira target kolone 'Customer Type', pristupila sam odabiru ulaznih kolona:
+Kolone **Unnamed: 0** i **id** uklonjene su jer predstavljaju identifikatore. Takve kolone ne sadrže korisne informacije za predviđanje i mogu dovesti do pogrešnog učenja modela.
 
-Izbačene kolone i obrazloženje:
+Kolona **satisfaction** uklonjena je zbog problema poznatog kao **data leakage**. Zadovoljstvo putnika je direktno povezano sa lojalnošću, pa bi model mogao ostvariti veoma visoku tačnost bez stvarnog učenja odnosa među ostalim karakteristikama. Cilj je da model nauči obrasce ponašanja korisnika na osnovu kvaliteta usluge, vrste putovanja i drugih atributa.
 
-1. 'Unnamed: 0' i 'id' – identifikatori koji ne nose informaciju o lojalnosti putnika. 
-   Njihovim uklanjanjem izbjegavam data leakage.
+### Zadržane kolone
 
-2. 'satisfaction' – iako na prvi pogled izgleda korisno, ova kolona je visoko korelirana 
-   sa targetom. Zadovoljni putnici su gotovo uvijek lojalni, a nezadovoljni često nelojalni. 
-   Zadržavanje ove kolone dovelo bi do lažno visoke tačnosti (preko 95%) i model ne bi 
-   naučio prave veze među ostalim karakteristikama.
+Zadržane su sljedeće grupe atributa:
 
-Zadržane kolone:
-- Sve demografske: Gender, Age
-- Karakteristike putovanja: Type of Travel, Class, Flight Distance
-- Sve ocjene usluga (0-5): Inflight wifi service, Online boarding, Seat comfort, itd.
-- Vremena kašnjenja: Departure Delay in Minutes, Arrival Delay in Minutes
+* Demografski podaci (*Gender, Age*)
+* Karakteristike putovanja (*Type of Travel, Class, Flight Distance*)
+* Ocjene kvaliteta usluge (*Inflight Wifi Service, Online Boarding, Seat Comfort, Cleanliness, Baggage Handling i ostale ocjene od 0 do 5*)
+* Podaci o kašnjenjima (*Departure Delay in Minutes, Arrival Delay in Minutes*)
 
-Napomena: Kolone sa ocjenama zadržavam jer pretpostavljam da lojalni putnici generalno 
-daju više ocjene, ali to model treba da dokaže.
+Pretpostavka je da kvalitet usluge, udobnost putovanja i tačnost letova mogu značajno uticati na lojalnost korisnika.
 
-Izbacujemo kolone iz tri glavna razloga:
+Nakon uklanjanja nepotrebnih kolona dataset je sadržavao **22 korisne ulazne karakteristike**.
 
-Razlog	Objašnjenje	Primjer u tvom datasetu
-1. Identifikatori	Kolone koje jedinstveno označavaju svaki red, ne nose informaciju za predviđanje	Unnamed: 0, id
-2. Data leakage (curenje informacija)	Kolone koje "otkrivaju" target vrijednost prije nego što model uči – daju lažno visoku tačnost	satisfaction (jer znaš da je zadovoljan = lojalan)
-
-4. Izbacivanje nepotrebnih kolona
-
-Prije obrade podataka, izbacila sam sljedeće kolone:
-
-1. 'Unnamed: 0' i 'id' – Ove kolone su identifikatori koji jedinstveno 
-   označavaju svakog putnika. One ne sadrže informaciju koja bi mogla 
-   predvidjeti da li je putnik lojalan ili ne. Njihovim uklanjanjem 
-   sprječavamo model da uči na nasumičnim brojevima.
-
-2. 'satisfaction' – Ovu kolonu izbacujem zbog data leakage. 
-   Zadovoljstvo putnika je direktno povezano sa lojalnošću – 
-   zadovoljni putnici su gotovo uvijek lojalni. Da je zadržim, 
-   model bi postigao vještački visoku tačnost (preko 95%) bez 
-   učenja pravih veza među ostalim karakteristikama.
-
-Nakon izbacivanja, dataset ima 22 kolone (od originalnih 25). 
-Sve ostale kolone su zadržane jer potencijalno utiču na Customer Type.
 ---
 
 ## 3. Početna analiza podataka (EDA)
 
-Nakon učitavanja dataseta izvršena je osnovna eksploratorna analiza podataka:
+Nakon učitavanja dataseta izvršena je osnovna eksploratorna analiza podataka.
 
-- `df.shape` → **(103904, 25)**, što znači da dataset sadrži 103.904 reda i 25 kolona.
-- `df.head()` → prikazuje prvih pet redova i potvrđuje prisustvo numeričkih i kategorijskih atributa.
-- `df.info()` → pokazuje da dataset sadrži 5 kategorijskih (`object`) kolona, dok su ostale numeričkog tipa.
-- `df.isnull().sum()` → otkriveno je da samo kolona **Arrival Delay in Minutes** sadrži nedostajuće vrijednosti (310).
-- `df.describe()` → daje statistički pregled numeričkih karakteristika.
+### Analiza strukture dataseta
 
-**3. Početno istraživanje podataka (EDA)**
+```python
+df.shape
+```
 
-Nakon učitavanja dataseta, izvršila sam sljedeće komande:
+Rezultat:
 
-- df.head() - prikazala sam prvih 5 redova kako bih vidjela kako izgledaju podaci. 
-  Uočila sam da postoje numeričke (Age, Flight Distance) i kategorijske kolone (Gender, Satisfaction).
+```python
+(103904, 25)
+```
 
-- df.info() - pokazao je da dataset ima X redova i Y kolona. 
-  Primijetila sam da kolone 'Arrival Delay in Minutes' ima 310 NaN vrijednosti, 
-  a 'Departure Delay in Minutes' ima 52 NaN vrijednosti.
+Dataset sadrži 103.904 reda i 25 kolona.
 
-- df.isnull().sum() - potvrdila sam tačan broj nedostajućih vrijednosti:
-  * Arrival Delay in Minutes: 310 nedostajućih
-  * Departure Delay in Minutes: 52 nedostajućih
-  * Ostale kolone nemaju NaN vrijednosti.
+### Pregled prvih redova
 
-- df.describe() - prikazala sam osnovnu statistiku za numeričke kolone. 
-  Uočila sam da se Age kreće od 7 do 85 godina, a Flight Distance od 31 do 4983 milja.
+```python
+df.head()
+```
+
+Prikaz prvih pet redova pokazao je kombinaciju numeričkih i kategorijskih atributa.
+
+### Informacije o kolonama
+
+```python
+df.info()
+```
+
+Analizom je utvrđeno da dataset sadrži nekoliko kategorijskih kolona tipa `object`, dok su ostale numeričkog tipa.
+
+### Provjera nedostajućih vrijednosti
+
+```python
+df.isnull().sum()
+```
+
+Uočeno je da kolona **Arrival Delay in Minutes** sadrži 310 nedostajućih vrijednosti.
+
+### Statistički pregled
+
+```python
+df.describe()
+```
+
+Prikazana je osnovna statistika za numeričke kolone, uključujući minimalne, maksimalne i prosječne vrijednosti.
 
 ---
 
 ## 4. Obrada nedostajućih vrijednosti
 
-Analizom je utvrđeno da samo kolona **Arrival Delay in Minutes** sadrži nedostajuće vrijednosti.
+Prilikom analize podataka ustanovljeno je da samo kolona **Arrival Delay in Minutes** sadrži nedostajuće vrijednosti.
 
-Primijenjena strategija:
+Za obradu nedostajućih podataka korištene su sljedeće strategije:
 
-- Za numeričke kolone korišten je **medijan**, jer je otporan na ekstremne vrijednosti.
-- Za kategorijske kolone korišten je **mod** (najčešća vrijednost).
+* Numeričke kolone popunjavane su medijanom.
+* Kategorijske kolone popunjavane su najčešćom vrijednošću (modom).
 
-Primjeri:
+Medijan je odabran jer je otporniji na ekstremne vrijednosti od aritmetičke sredine.
 
-- `Arrival Delay in Minutes` popunjena je vrijednošću **0.0** (medijan).
-- `Gender` bi u slučaju nedostajućih vrijednosti bio popunjen vrijednošću **Female** (mod).
-
-Nakon obrade:
+Nakon popunjavanja svih nedostajućih vrijednosti izvršena je ponovna provjera:
 
 ```python
 df.isnull().sum().sum()
 ```
 
-Rezultat je bio:
+Rezultat:
 
 ```python
 0
 ```
 
-što potvrđuje da više nema nedostajućih vrijednosti.
+što potvrđuje da dataset više ne sadrži NaN vrijednosti.
 
 ---
 
-## 5. Encoding (pretvaranje kategorijskih podataka u numeričke)
+## 5. Encoding kategorijskih podataka
 
-Za target kolonu **Customer Type** korišten je **LabelEncoder**:
+Kako modeli mašinskog učenja mogu raditi samo sa numeričkim podacima, bilo je potrebno izvršiti pretvaranje kategorijskih vrijednosti u numerički oblik.
 
-- Disloyal Customer → 0
-- Loyal Customer → 1
+### Label Encoding target kolone
 
-Za ostale kategorijske kolone korišten je **One-Hot Encoding** pomoću funkcije `pd.get_dummies()`:
+Za kolonu **Customer Type** korišten je LabelEncoder:
 
-- Gender
-- Type of Travel
-- Class
+* Disloyal Customer → 0
+* Loyal Customer → 1
 
-Parametar `drop_first=True` korišten je radi izbjegavanja multikolinearnosti.
+### One-Hot Encoding ulaznih atributa
 
-Nakon encodinga svi atributi su postali numerički i spremni za treniranje modela.
+Za ostale kategorijske kolone korišten je One-Hot Encoding:
+
+* Gender
+* Type of Travel
+* Class
+
+Korišten je parametar `drop_first=True` kako bi se izbjegla multikolinearnost.
+
+Nakon encodinga svi atributi postali su numerički i spremni za treniranje modela.
 
 ---
 
 ## 6. Podjela na trening i test skup
 
-Podaci su podijeljeni pomoću funkcije `train_test_split()`:
+Podaci su podijeljeni pomoću funkcije `train_test_split()`.
 
-- `test_size = 0.2`
-- `random_state = 42`
-- `stratify = y`
+Parametri:
+
+* test_size = 0.2
+* random_state = 42
+* stratify = y
 
 Dobijeni skupovi:
 
-| Skup | Dimenzije |
-|--------|------------|
+| Skup    | Dimenzije   |
+| ------- | ----------- |
 | X_train | (83123, 22) |
-| X_test | (20781, 22) |
-| y_train | (83123,) |
-| y_test | (20781,) |
+| X_test  | (20781, 22) |
+| y_train | (83123,)    |
+| y_test  | (20781,)    |
 
-Korištenjem parametra `stratify` očuvana je originalna distribucija klasa u svim skupovima podataka.
+Parametar `stratify` korišten je kako bi se očuvala ista distribucija klasa u trening i test skupu.
 
 ---
 
 ## 7. Skaliranje podataka
 
-Za model **Logistic Regression** primijenjeno je skaliranje pomoću **StandardScaler-a**, jer je ovaj model osjetljiv na različite raspone vrijednosti atributa.
+Za model **Logistic Regression** primijenjeno je skaliranje pomoću StandardScaler-a.
 
 Korištene metode:
 
-- `fit_transform()` nad trening skupom
-- `transform()` nad test skupom
+```python
+scaler.fit_transform(X_train)
+scaler.transform(X_test)
+```
 
-Model **Random Forest** ne zahtijeva skaliranje, pa je treniran na originalnim vrijednostima atributa.
+Skaliranje je potrebno jer Logistic Regression koristi udaljenosti i osjetljiv je na različite raspone vrijednosti atributa.
+
+Model **Random Forest** ne zahtijeva skaliranje pa je treniran na originalnim podacima.
 
 ---
 
 ## 8. Izbor modela i treniranje
 
-Za rješavanje problema korištena su dva klasifikacijska modela:
+Za rješavanje klasifikacijskog problema korištena su dva modela.
 
 ### Logistic Regression
 
 Parametri:
 
-- `max_iter = 1000`
-- `random_state = 42`
+```python
+LogisticRegression(max_iter=1000, random_state=42)
+```
 
-Predstavlja jednostavan i interpretabilan bazni model.
+Ovaj model predstavlja jednostavan i lako interpretabilan bazni model.
 
 ### Random Forest
 
 Parametri:
 
-- `n_estimators = 100`
-- `random_state = 42`
+```python
+RandomForestClassifier(n_estimators=100, random_state=42)
+```
 
-Predstavlja napredniji ansambl model sposoban da prepozna složenije obrasce u podacima.
+Random Forest koristi više stabala odlučivanja i sposoban je prepoznati složenije obrasce u podacima.
 
 ---
 
-## 9. Rezultati
+## 9. Rezultati i zaključak
 
-Nakon treniranja i evaluacije modela, **Random Forest** ostvario je bolje rezultate po svim posmatranim metrikama, posebno po vrijednosti:
+Nakon treniranja i evaluacije modela, Random Forest ostvario je bolje rezultate od Logistic Regression modela.
 
-- **Recall = 99.57%**
+Najznačajniji rezultat bio je:
 
-To znači da model vrlo uspješno prepoznaje lojalne korisnike i rijetko ih pogrešno klasificira.
+* Recall = 99.57%
+
+To znači da model veoma uspješno prepoznaje lojalne korisnike i rijetko ih pogrešno klasificira.
 
 ### Zaključak
 
-Na osnovu dobijenih rezultata, **Random Forest** se pokazao kao najuspješniji model za predviđanje lojalnosti putnika. Model može biti koristan aviokompanijama za identifikaciju korisnika sa visokim potencijalom za dugoročnu lojalnost i planiranje odgovarajućih marketinških strategija.
+Na osnovu dobijenih rezultata može se zaključiti da je Random Forest najpogodniji model za predviđanje lojalnosti putnika u ovom datasetu. Model može pomoći aviokompanijama da identifikuju korisnike sa najvećim potencijalom za dugoročnu lojalnost i na osnovu toga planiraju marketinške aktivnosti i programe zadržavanja korisnika.
